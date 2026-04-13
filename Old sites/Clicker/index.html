@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Örvar Clicker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --panel: #16162a;
+      --border: #2e2e55;
+      --accent: #f7c948;
+      --accent2: #ff6b6b;
+      --accent3: #6bffb8;
+      --text: #f0e6ff;
+      --muted: #7b6a9a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image:
+        radial-gradient(ellipse at 15% 15%, #2a0a5e44 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 85%, #0a2a4a44 0%, transparent 55%);
+    }
+    h1 {
+      font-family: 'Boogaloo', cursive;
+      font-size: 2.8rem;
+      color: var(--accent);
+      text-shadow: 0 0 20px #f7c94860, 3px 3px 0 #7a5c00;
+      letter-spacing: 2px;
+      margin: 20px 0 2px;
+      text-align: center;
+    }
+    .tagline { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+    .game-wrapper {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 960px;
+      padding: 0 16px 40px;
+      align-items: flex-start;
+    }
+    .left-panel { display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 0 0 300px; }
+    .counter-box {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px 28px; text-align: center; width: 100%;
+    }
+    .counter-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .counter-value { font-family: 'Boogaloo', cursive; font-size: 2.4rem; color: var(--accent); line-height: 1.1; }
+    .counter-cps { font-size: 0.8rem; color: var(--accent3); margin-top: 2px; }
+    .orvar-btn {
+      position: relative; width: 220px; height: 220px; cursor: pointer;
+      border-radius: 50%; border: none; background: none; padding: 0;
+      transition: transform 0.08s; filter: drop-shadow(0 0 18px #c084fc55);
+    }
+    .orvar-btn:active { transform: scale(0.91); filter: drop-shadow(0 0 32px #f7c94888); }
+    .orvar-btn img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+      border: 4px solid var(--accent); box-shadow: 0 0 0 4px #f7c94830;
+      display: block; background: #000; pointer-events: none; user-select: none;
+    }
+    .orvar-btn:hover img { border-color: var(--accent3); box-shadow: 0 0 0 6px #6bffb830; }
+    .float-num {
+      position: fixed; font-family: 'Boogaloo', cursive; font-size: 1.5rem;
+      color: var(--accent); pointer-events: none; z-index: 999;
+      animation: floatUp 0.9s ease-out forwards; text-shadow: 0 2px 8px #000a;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(1.4); }
+    }
+    .right-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .section-title {
+      font-family: 'Boogaloo', cursive; font-size: 1.2rem; color: var(--accent);
+      letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 2px;
+    }
+    .upgrade-btn {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      text-align: left; color: var(--text); font-family: 'Nunito', sans-serif; width: 100%;
+    }
+    .upgrade-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e1e38; transform: translateX(3px); }
+    .upgrade-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+    .upgrade-btn.affordable { border-color: #f7c94855; box-shadow: 0 0 10px #f7c94815; }
+    .upgrade-icon { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
+    .upgrade-info { flex: 1; }
+    .upgrade-name { font-weight: 900; font-size: 0.95rem; color: var(--text); }
+    .upgrade-desc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+    .upgrade-right { text-align: right; flex-shrink: 0; }
+    .upgrade-cost { font-family: 'Boogaloo', cursive; font-size: 1.1rem; color: var(--accent); }
+    .upgrade-owned { font-size: 0.72rem; color: var(--accent3); }
+    .milestone-bar {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 14px; font-size: 0.8rem; color: var(--muted); width: 100%; text-align: center;
+    }
+    .milestone-bar span { color: var(--accent2); font-weight: 700; }
+    #notif {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #1a0a00; font-family: 'Boogaloo', cursive;
+      font-size: 1.1rem; padding: 10px 24px; border-radius: 40px;
+      pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 1000; white-space: nowrap;
+    }
+    #notif.show { opacity: 1; }
+    .click-power { font-size: 0.78rem; color: var(--muted); text-align: center; }
+    .click-power span { color: var(--accent2); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<h1>🎩 Örvar Clicker 🎩</h1>
+<p class="tagline">click him. collect him. praise him.</p>
+<div id="notif"></div>
+
+<div class="game-wrapper">
+  <div class="left-panel">
+    <div class="counter-box">
+      <div class="counter-label">Örvars Collected</div>
+      <div class="counter-value" id="count">0</div>
+      <div class="counter-cps" id="cps-display">0 per second</div>
+    </div>
+
+    <button class="orvar-btn" id="orvar-btn" onclick="clickOrvar(event)">
+      <img src="Bingotime.png" alt="Örvar" draggable="false"/>
+    </button>
+
+    <div class="click-power">Each click: <span id="click-power-display">1</span> Örvar(s)</div>
+    <div class="milestone-bar" id="milestone-bar">Next milestone: <span id="next-milestone">10</span> Örvars</div>
+  </div>
+
+  <div class="right-panel">
+    <div class="section-title">⬆️ Upgrades</div>
+    <div id="upgrades-container"></div>
+  </div>
+</div>
+
+<script>
+  let orvars = 0;
+  let totalOrvars = 0;
+  let clickPower = 1;
+  let cps = 0;
+
+  const MILESTONES = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
+  const MILESTONE_MSGS = [
+    '10 Örvars! He\'s flattered.',
+    '50 Örvars! The gang is growing.',
+    '100 Örvars! A full classroom of Örvars.',
+    '500 Örvars! A village of Örvars.',
+    '1,000 Örvars! A tiny Örvar nation.',
+    '5,000 Örvars! Örvar continent unlocked.',
+    '10,000 Örvars! Planet Örvar.',
+    '50,000 Örvars! Örvar galaxy.',
+    '100,000 Örvars! THE ÖRVAR DIMENSION IS OPEN.',
+  ];
+  let milestoneIdx = 0;
+
+  const UPGRADES = [
+    { id:'friend',    name:'Send a Friend',       icon:'🙋',  desc:'+1 Örvar/sec — he brings a buddy',           baseCost:15,    cpsGain:1,   clickGain:0,   owned:0 },
+    { id:'hat',       name:'Extra Cap',            icon:'🧢',  desc:'+1 click power — the hat gives strength',    baseCost:25,    cpsGain:0,   clickGain:1,   owned:0 },
+    { id:'tie',       name:'Red Tie Factory',      icon:'👔',  desc:'+3 Örvars/sec — mass tie production',        baseCost:80,    cpsGain:3,   clickGain:0,   owned:0 },
+    { id:'sock',      name:'Funky Sock Lab',       icon:'🧦',  desc:'+5 click power — powered by funky socks',    baseCost:120,   cpsGain:0,   clickGain:5,   owned:0 },
+    { id:'suit',      name:'Suit Emporium',        icon:'🕴️',  desc:'+10 Örvars/sec — dapper lads everywhere',    baseCost:300,   cpsGain:10,  clickGain:0,   owned:0 },
+    { id:'bingo',     name:'Bingo Night',          icon:'🎱',  desc:'+20 click power — bingo = big brain',        baseCost:500,   cpsGain:0,   clickGain:20,  owned:0 },
+    { id:'captain',   name:"Captain's Fleet",      icon:'⚓',  desc:'+40 Örvars/sec — sailing to glory',          baseCost:1200,  cpsGain:40,  clickGain:0,   owned:0 },
+    { id:'corsage',   name:'Corsage Plantation',   icon:'🌸',  desc:'+80 click power — flowers = power',          baseCost:2000,  cpsGain:0,   clickGain:80,  owned:0 },
+    { id:'clone',     name:'Örvar Cloning Lab',    icon:'🧬',  desc:'+200 Örvars/sec — exponential örvar',        baseCost:6000,  cpsGain:200, clickGain:0,   owned:0 },
+    { id:'dimension', name:'Örvar Dimension',      icon:'🌀',  desc:'+500 click power — infinite örvar realm',    baseCost:15000, cpsGain:0,   clickGain:500, owned:0 },
+  ];
+
+  function getCost(upg) { return Math.floor(upg.baseCost * Math.pow(1.5, upg.owned)); }
+
+  function renderUpgrades() {
+    const c = document.getElementById('upgrades-container');
+    c.innerHTML = '';
+    UPGRADES.forEach((upg, i) => {
+      const cost = getCost(upg);
+      const canAfford = orvars >= cost;
+      const btn = document.createElement('button');
+      btn.className = 'upgrade-btn' + (canAfford ? ' affordable' : '');
+      btn.disabled = !canAfford;
+      btn.innerHTML = `
+        <div class="upgrade-icon">${upg.icon}</div>
+        <div class="upgrade-info">
+          <div class="upgrade-name">${upg.name}</div>
+          <div class="upgrade-desc">${upg.desc}</div>
+        </div>
+        <div class="upgrade-right">
+          <div class="upgrade-cost">🪙 ${formatNum(cost)}</div>
+          <div class="upgrade-owned">owned: ${upg.owned}</div>
+        </div>`;
+      btn.onclick = () => buyUpgrade(i);
+      c.appendChild(btn);
+    });
+  }
+
+  function buyUpgrade(i) {
+    const upg = UPGRADES[i];
+    const cost = getCost(upg);
+    if (orvars < cost) return;
+    orvars -= cost;
+    upg.owned++;
+    clickPower += upg.clickGain;
+    cps += upg.cpsGain;
+    updateDisplay();
+    renderUpgrades();
+    notify(`${upg.icon} ${upg.name} purchased!`);
+  }
+
+  function clickOrvar(e) {
+    orvars += clickPower;
+    totalOrvars += clickPower;
+    spawnFloat(e.clientX, e.clientY, '+' + clickPower);
+    checkMilestones();
+    updateDisplay();
+    renderUpgrades();
+  }
+
+  function spawnFloat(x, y, text) {
+    const el = document.createElement('div');
+    el.className = 'float-num';
+    el.textContent = text;
+    el.style.left = (x + Math.random() * 40 - 20) + 'px';
+    el.style.top = (y - 20) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+
+  setInterval(() => {
+    if (cps > 0) {
+      const gain = cps / 20;
+      orvars += gain;
+      totalOrvars += gain;
+      checkMilestones();
+      updateDisplay();
+      renderUpgrades();
+    }
+  }, 50);
+
+  function checkMilestones() {
+    if (milestoneIdx < MILESTONES.length && totalOrvars >= MILESTONES[milestoneIdx]) {
+      notify('🎉 ' + MILESTONE_MSGS[milestoneIdx]);
+      milestoneIdx++;
+      updateMilestoneBar();
+    }
+  }
+
+  function updateMilestoneBar() {
+    const bar = document.getElementById('milestone-bar');
+    if (milestoneIdx >= MILESTONES.length) {
+      bar.innerHTML = '🏆 All milestones reached! You are the Örvar King.';
+    } else {
+      document.getElementById('next-milestone').textContent = formatNum(MILESTONES[milestoneIdx]);
+    }
+  }
+
+  function updateDisplay() {
+    document.getElementById('count').textContent = formatNum(Math.floor(orvars));
+    document.getElementById('cps-display').textContent = formatNum(cps) + ' per second';
+    document.getElementById('click-power-display').textContent = clickPower;
+  }
+
+  function formatNum(n) {
+    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+    return Math.floor(n).toString();
+  }
+
+  let notifTimer;
+  function notify(msg) {
+    const el = document.getElementById('notif');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(notifTimer);
+    notifTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  updateMilestoneBar();
+  updateDisplay();
+  renderUpgrades();
+</script>
+</body>
+</html>

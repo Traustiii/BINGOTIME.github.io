@@ -3,287 +3,858 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Örvar Clicker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <title>Jonathan Y. Mother – Wokipedia, the free encyclopedia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Linux+Libertine+Display:ital,wght@0,400;0,700;1,400&family=Linux+Biolinum:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #0d0d1a;
-      --panel: #16162a;
-      --border: #2e2e55;
-      --accent: #f7c948;
-      --accent2: #ff6b6b;
-      --accent3: #6bffb8;
-      --text: #f0e6ff;
-      --muted: #7b6a9a;
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --border: #a2a9b1;
+      --border-light: #eaecf0;
+      --text: #202122;
+      --text-muted: #54595d;
+      --link: #3366cc;
+      --link-visited: #6b4ba5;
+      --link-red: #cc2200;
+      --accent: #3366cc;
+      --infobox-bg: #f8f9fa;
+      --infobox-header: #cee0f2;
+      --warn-bg: #fff3cd;
+      --warn-border: #f0ad4e;
+      --toc-bg: #f8f9fa;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: var(--bg);
+      font-family: 'Linux Libertine Display', 'Georgia', serif;
+      font-size: 14px;
+      line-height: 1.6;
       color: var(--text);
-      font-family: 'Nunito', sans-serif;
-      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    /* ── HEADER ── */
+    #site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 20px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      background-image:
-        radial-gradient(ellipse at 15% 15%, #2a0a5e44 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 85%, #0a2a4a44 0%, transparent 55%);
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    h1 {
-      font-family: 'Boogaloo', cursive;
-      font-size: 2.8rem;
-      color: var(--accent);
-      text-shadow: 0 0 20px #f7c94860, 3px 3px 0 #7a5c00;
-      letter-spacing: 2px;
-      margin: 20px 0 2px;
-      text-align: center;
+    .logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-globe {
+      width: 50px; height: 50px;
+      background: radial-gradient(circle at 35% 35%, #cee0f2, #3366cc 60%, #0d2b6b);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+      flex-shrink: 0;
     }
-    .tagline { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-    .game-wrapper {
+    .logo-text { font-family: 'Linux Libertine Display', serif; }
+    .logo-text .site-name { font-size: 20px; font-weight: 700; color: var(--text); }
+    .logo-text .site-tagline { font-size: 11px; color: var(--text-muted); font-style: italic; }
+    .header-search {
+      margin-left: auto;
       display: flex;
-      gap: 20px;
-      width: 100%;
-      max-width: 960px;
-      padding: 0 16px 40px;
+      gap: 0;
+    }
+    .header-search input {
+      border: 1px solid var(--border);
+      border-right: none;
+      padding: 5px 10px;
+      font-size: 13px;
+      border-radius: 2px 0 0 2px;
+      width: 220px;
+      outline: none;
+      font-family: inherit;
+      background: var(--surface);
+    }
+    .header-search button {
+      border: 1px solid var(--border);
+      background: var(--infobox-bg);
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 0 2px 2px 0;
+      font-size: 13px;
+    }
+    .header-tabs { display: flex; gap: 2px; margin-left: 30px; }
+    .tab {
+      padding: 4px 12px;
+      font-size: 12.5px;
+      color: var(--link);
+      border: 1px solid transparent;
+      border-bottom: none;
+      cursor: pointer;
+      border-radius: 2px 2px 0 0;
+      text-decoration: none;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    .tab.active {
+      background: var(--surface);
+      border-color: var(--border);
+      border-bottom-color: var(--surface);
+      color: var(--text);
+      margin-bottom: -1px;
+    }
+
+    /* ── LAYOUT ── */
+    #layout { display: flex; max-width: 1200px; margin: 0 auto; padding: 16px 20px; gap: 24px; }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: 180px;
+      flex-shrink: 0;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    .sidebar-section { margin-bottom: 18px; }
+    .sidebar-section h4 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+    .sidebar-section ul { list-style: none; padding: 0; }
+    .sidebar-section ul li { margin-bottom: 4px; }
+    .sidebar-section ul li a { color: var(--link); font-size: 12.5px; text-decoration: none; }
+    .sidebar-section ul li a:hover { text-decoration: underline; }
+
+    /* ── MAIN ── */
+    #main { flex: 1; min-width: 0; }
+
+    .page-title {
+      font-family: 'Linux Libertine Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 14px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .page-title small {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── WARNING BANNER ── */
+    .warn-box {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 3px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
       align-items: flex-start;
+      font-family: 'Linux Biolinum', sans-serif;
     }
-    .left-panel { display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 0 0 300px; }
-    .counter-box {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 16px; padding: 14px 28px; text-align: center; width: 100%;
+    .warn-box .icon { font-size: 20px; flex-shrink: 0; }
+    .warn-box a { color: var(--link); }
+
+    /* ── INFOBOX ── */
+    .infobox {
+      float: right;
+      clear: right;
+      margin: 0 0 16px 20px;
+      width: 270px;
+      border: 1px solid var(--border);
+      background: var(--infobox-bg);
+      font-size: 12.5px;
+      border-collapse: collapse;
+      font-family: 'Linux Biolinum', sans-serif;
     }
-    .counter-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-    .counter-value { font-family: 'Boogaloo', cursive; font-size: 2.4rem; color: var(--accent); line-height: 1.1; }
-    .counter-cps { font-size: 0.8rem; color: var(--accent3); margin-top: 2px; }
-    .orvar-btn {
-      position: relative; width: 220px; height: 220px; cursor: pointer;
-      border-radius: 50%; border: none; background: none; padding: 0;
-      transition: transform 0.08s; filter: drop-shadow(0 0 18px #c084fc55);
+    .infobox-title {
+      background: var(--infobox-header);
+      text-align: center;
+      padding: 7px 10px;
+      font-weight: 700;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
     }
-    .orvar-btn:active { transform: scale(0.91); filter: drop-shadow(0 0 32px #f7c94888); }
-    .orvar-btn img {
-      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-      border: 4px solid var(--accent); box-shadow: 0 0 0 4px #f7c94830;
-      display: block; background: #000; pointer-events: none; user-select: none;
+    .infobox-img {
+      text-align: center;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-light);
     }
-    .orvar-btn:hover img { border-color: var(--accent3); box-shadow: 0 0 0 6px #6bffb830; }
-    .float-num {
-      position: fixed; font-family: 'Boogaloo', cursive; font-size: 1.5rem;
-      color: var(--accent); pointer-events: none; z-index: 999;
-      animation: floatUp 0.9s ease-out forwards; text-shadow: 0 2px 8px #000a;
+    .portrait-img {
+      width: 180px;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 6px;
+      border: 1px solid var(--border);
     }
-    @keyframes floatUp {
-      0%   { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-80px) scale(1.4); }
+    .infobox-img figcaption {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
     }
-    .right-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-    .section-title {
-      font-family: 'Boogaloo', cursive; font-size: 1.2rem; color: var(--accent);
-      letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 2px;
+    .infobox table { width: 100%; border-collapse: collapse; }
+    .infobox tr { border-top: 1px solid var(--border-light); }
+    .infobox td { padding: 4px 8px; vertical-align: top; }
+    .infobox td:first-child { font-weight: 700; width: 40%; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--toc-bg);
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+      min-width: 200px;
+      max-width: 320px;
+      font-family: 'Linux Biolinum', sans-serif;
     }
-    .upgrade-btn {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-      cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s;
-      text-align: left; color: var(--text); font-family: 'Nunito', sans-serif; width: 100%;
+    .toc-title {
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 13px;
     }
-    .upgrade-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e1e38; transform: translateX(3px); }
-    .upgrade-btn:disabled { opacity: 0.38; cursor: not-allowed; }
-    .upgrade-btn.affordable { border-color: #f7c94855; box-shadow: 0 0 10px #f7c94815; }
-    .upgrade-icon { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
-    .upgrade-info { flex: 1; }
-    .upgrade-name { font-weight: 900; font-size: 0.95rem; color: var(--text); }
-    .upgrade-desc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
-    .upgrade-right { text-align: right; flex-shrink: 0; }
-    .upgrade-cost { font-family: 'Boogaloo', cursive; font-size: 1.1rem; color: var(--accent); }
-    .upgrade-owned { font-size: 0.72rem; color: var(--accent3); }
-    .milestone-bar {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-      padding: 10px 14px; font-size: 0.8rem; color: var(--muted); width: 100%; text-align: center;
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 3px; }
+    .toc a { color: var(--link); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── ARTICLE BODY ── */
+    #article p { margin-bottom: 12px; line-height: 1.7; }
+    #article a { color: var(--link); text-decoration: none; }
+    #article a:hover { text-decoration: underline; }
+    #article a.redlink { color: var(--link-red); }
+
+    h2.section-title {
+      font-family: 'Linux Libertine Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 3px;
+      margin: 24px 0 10px;
+      color: var(--text);
     }
-    .milestone-bar span { color: var(--accent2); font-weight: 700; }
-    #notif {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      background: var(--accent); color: #1a0a00; font-family: 'Boogaloo', cursive;
-      font-size: 1.1rem; padding: 10px 24px; border-radius: 40px;
-      pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 1000; white-space: nowrap;
+    h3.subsection-title {
+      font-family: 'Linux Libertine Display', serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin: 18px 0 8px;
+      color: var(--text);
     }
-    #notif.show { opacity: 1; }
-    .click-power { font-size: 0.78rem; color: var(--muted); text-align: center; }
-    .click-power span { color: var(--accent2); font-weight: 700; }
+
+    /* ── QUOTE BLOCK ── */
+    .article-quote {
+      border-left: 4px solid var(--accent);
+      padding: 8px 16px;
+      margin: 14px 0;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 13.5px;
+      background: #f0f4ff;
+    }
+    .article-quote cite {
+      display: block;
+      font-size: 12px;
+      margin-top: 4px;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* ── CITATION NEEDED ── */
+    .cn {
+      color: var(--link-red);
+      font-size: 11px;
+      vertical-align: super;
+      cursor: help;
+      font-style: normal;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+
+    /* ── REFNOTE ── */
+    sup.ref {
+      color: var(--link);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+
+    /* ── HATNOTE ── */
+    .hatnote {
+      font-style: italic;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+
+    /* ── NAVBOX ── */
+    .navbox {
+      border: 1px solid var(--border);
+      background: var(--infobox-bg);
+      font-size: 12px;
+      margin-top: 28px;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    .navbox-header {
+      background: var(--infobox-header);
+      text-align: center;
+      padding: 5px 10px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .navbox-body { padding: 8px 12px; }
+    .navbox-body a { color: var(--link); margin-right: 10px; }
+
+    /* ── REFERENCES ── */
+    .references {
+      font-size: 12px;
+      column-count: 2;
+      column-gap: 20px;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    .references li { margin-bottom: 4px; color: var(--text-muted); }
+    .references a { color: var(--link); }
+
+    /* ── CATEGORIES ── */
+    .categories {
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 20px;
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    .categories a { color: var(--link); margin-right: 8px; }
+
+    /* ── FOOTER ── */
+    #footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'Linux Biolinum', sans-serif;
+    }
+    #footer a { color: var(--link); }
+
+    /* ── CLEARFIX ── */
+    .clearfix::after { content: ""; display: table; clear: both; }
+
+    @media (max-width: 760px) {
+      .infobox { float: none; width: 100%; margin: 0 0 16px; }
+      #sidebar { display: none; }
+      .references { column-count: 1; }
+    }
   </style>
 </head>
 <body>
 
-<h1>🎩 Örvar Clicker 🎩</h1>
-<p class="tagline">click him. collect him. praise him.</p>
-<div id="notif"></div>
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header id="site-header">
+  <a class="logo-wrap" href="#">
+    <div class="logo-globe">🌐</div>
+    <div class="logo-text">
+      <div class="site-name">Wokipedia</div>
+      <div class="site-tagline">The Free Encyclopedia (Totally Legit)</div>
+    </div>
+  </a>
+  <div class="header-tabs">
+    <a class="tab active" href="#">Article</a>
+    <a class="tab" href="#">Talk</a>
+    <a class="tab" href="#">Edit</a>
+    <a class="tab" href="#">History</a>
+  </div>
+  <div class="header-search">
+    <input type="text" placeholder="Search Wokipedia…" />
+    <button>🔍</button>
+  </div>
+</header>
 
-<div class="game-wrapper">
-  <div class="left-panel">
-    <div class="counter-box">
-      <div class="counter-label">Örvars Collected</div>
-      <div class="counter-value" id="count">0</div>
-      <div class="counter-cps" id="cps-display">0 per second</div>
+<!-- ═══════════════════ LAYOUT ═══════════════════ -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-section">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="#">Main Page</a></li>
+        <li><a href="#">Contents</a></li>
+        <li><a href="#">Featured Articles</a></li>
+        <li><a href="#">Random Article</a></li>
+        <li><a href="#">Donate</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h4>Contribute</h4>
+      <ul>
+        <li><a href="#">Help</a></li>
+        <li><a href="#">Learn to edit</a></li>
+        <li><a href="#">Community portal</a></li>
+        <li><a href="#">Recent changes</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h4>Tools</h4>
+      <ul>
+        <li><a href="#">What links here</a></li>
+        <li><a href="#">Print/export</a></li>
+        <li><a href="#">Permanent link</a></li>
+        <li><a href="#">Cite this page</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h4>Languages</h4>
+      <ul>
+        <li><a href="#">Dansk</a></li>
+        <li><a href="#">Deutsch</a></li>
+        <li><a href="#">Español</a></li>
+        <li><a href="#">Français</a></li>
+        <li><a href="#">日本語</a></li>
+        <li><a href="#">Русский</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- WARNING BANNERS -->
+    <div class="warn-box">
+      <span class="icon">⚠️</span>
+      <div>
+        <b>This article's neutrality is disputed.</b> Relevant discussion may be found on the
+        <a href="#">talk page</a>. Please do not remove this notice until the dispute is resolved.
+        <em>(October 2019)</em>
+      </div>
+    </div>
+    <div class="warn-box" style="background:#fde8e8; border-color:#c0392b;">
+      <span class="icon">☣️</span>
+      <div>
+        <b>Content warning:</b> This article contains descriptions of extreme danger, reckless behaviour,
+        and an unusual number of incidents involving wild geese. Reader discretion is advised.
+      </div>
     </div>
 
-    <button class="orvar-btn" id="orvar-btn" onclick="clickOrvar(event)">
-      <img src="Bingotime.png" alt="Örvar" draggable="false"/>
-    </button>
+    <h1 class="page-title">
+      Jonathan Y. Mother
+      <small>Redirected from "Joe Mama" · Also known as "The Unkillable"</small>
+    </h1>
 
-    <div class="click-power">Each click: <span id="click-power-display">1</span> Örvar(s)</div>
-    <div class="milestone-bar" id="milestone-bar">Next milestone: <span id="next-milestone">10</span> Örvars</div>
-  </div>
+    <!-- INFOBOX -->
+    <aside class="infobox">
+      <div class="infobox-title">Jonathan Y. Mother</div>
+      <div class="infobox-img">
+        <img class="portrait-img" src="JoeYMama.jpg" alt="Portrait of Jonathan Y. Mother" />
+        <figcaption>Only known photograph of Mother, taken at the 1987 International<br>Noodle Heist Summit. Colourised.</figcaption>
+      </div>
+      <table>
+        <tr><td>Born</td><td><b>March 32, 1961</b><br><span style="color:#54595d">Unnamed Swamp, Louisiana, USA</span></td></tr>
+        <tr><td>Nickname</td><td><b>Joe Mama</b><br><i>"The Unkillable"<br>"Big Bones"<br>"Sir Danger-a-Lot"</i></td></tr>
+        <tr><td>Died</td><td><b>Not confirmed</b><sup class="ref">[1]</sup></td></tr>
+        <tr><td>Occupation</td><td>Arms dealer, amateur geologist, unlicensed dentist, competitive napper</td></tr>
+        <tr><td>Known for</td><td>18 confirmed brushes with death; the 1994 <a href="#">Great Nacho Incident</a>; surviving a <a href="#">direct hit from a golf cart</a></td></tr>
+        <tr><td>Height</td><td>Disputed. Estimates range from 5′2″ to 7′11″</td></tr>
+        <tr><td>Weight</td><td><i>"Substantial"</i> — <a href="#">Interpol, 2003</a></td></tr>
+        <tr><td>Nationality</td><td>American (disputed by Andorra)</td></tr>
+        <tr><td>Spouse(s)</td><td>Barbara "Babs" Kowalski<br><i>(m. 1988; annulled 1988)</i></td></tr>
+      </table>
+    </aside>
 
-  <div class="right-panel">
-    <div class="section-title">⬆️ Upgrades</div>
-    <div id="upgrades-container"></div>
-  </div>
-</div>
+    <!-- ARTICLE BODY -->
+    <div id="article" class="clearfix">
 
-<script>
-  let orvars = 0;
-  let totalOrvars = 0;
-  let clickPower = 1;
-  let cps = 0;
+      <p>
+        <b>Jonathan Yevgeny Mother</b> (born March 32, 1961<sup class="ref">[2]</sup>), universally known by his nickname
+        <b>"Joe Mama"</b>, is a controversial American <a href="#">adventurer</a>,
+        alleged <a href="#">arms dealer</a>, self-described <a href="#" class="redlink">noodle philosopher</a>, and
+        what multiple government agencies have called "a persistent and deeply inconvenient problem."<sup class="ref">[3]</sup>
+        Over the course of six extraordinary decades, Mother has survived eighteen confirmed near-death
+        experiences, <a href="#">four international arrest warrants</a>, and one particularly hostile
+        <a href="#">Canadian goose</a>. He is widely considered one of the most dangerous — and most
+        inexplicably lucky — individuals in modern history.
+      </p>
+      <p>
+        Mother first rose to infamy in the late 1980s when he reportedly single-handedly disrupted
+        a <a href="#">cheese smuggling ring</a> operating out of the Swiss Alps, not out of heroism,
+        but because, as he later testified before Congress, he <i>"just really wanted that Gruyère."</i><sup class="ref">[4]</sup>
+        Since then, he has been linked to at least 23 international incidents, 7 rogue expeditions,
+        and one catastrophic misunderstanding at a Danish pastry competition that resulted in
+        a two-year diplomatic crisis between Denmark and the United Nations.<sup class="ref">[5]</sup>
+      </p>
+      <p>
+        Despite — or perhaps because of — his notoriety, Mother commands a devoted global following.
+        His self-published memoir, <i>I Told You So: The Joe Mama Story</i> (1999), sold an estimated
+        four million copies, though <span class="cn">[citation needed]</span> most of these are believed to have been
+        purchased by Mother himself using funds of unclear origin. He remains at large as of the
+        time of writing.
+      </p>
 
-  const MILESTONES = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
-  const MILESTONE_MSGS = [
-    '10 Örvars! He\'s flattered.',
-    '50 Örvars! The gang is growing.',
-    '100 Örvars! A full classroom of Örvars.',
-    '500 Örvars! A village of Örvars.',
-    '1,000 Örvars! A tiny Örvar nation.',
-    '5,000 Örvars! Örvar continent unlocked.',
-    '10,000 Örvars! Planet Örvar.',
-    '50,000 Örvars! Örvar galaxy.',
-    '100,000 Örvars! THE ÖRVAR DIMENSION IS OPEN.',
-  ];
-  let milestoneIdx = 0;
+      <!-- TOC -->
+      <div class="toc">
+        <div class="toc-title">Contents <span style="font-weight:400;font-size:11px">[<a href="#">hide</a>]</span></div>
+        <ol>
+          <li><a href="#early-life">Early life and origins</a></li>
+          <li><a href="#rise">Rise to infamy (1985–1994)</a>
+            <ol style="padding-left:16px">
+              <li><a href="#cheese">The Great Cheese Caper</a></li>
+              <li><a href="#nacho">The 1994 Nacho Incident</a></li>
+            </ol>
+          </li>
+          <li><a href="#danger">Documented brushes with death</a></li>
+          <li><a href="#international">International incidents</a></li>
+          <li><a href="#legacy">Legacy and cultural impact</a></li>
+          <li><a href="#sightings">Recent sightings</a></li>
+          <li><a href="#notes">Notes</a></li>
+          <li><a href="#references">References</a></li>
+        </ol>
+      </div>
 
-  const UPGRADES = [
-    { id:'friend',    name:'Send a Friend',       icon:'🙋',  desc:'+1 Örvar/sec — he brings a buddy',           baseCost:15,    cpsGain:1,   clickGain:0,   owned:0 },
-    { id:'hat',       name:'Extra Cap',            icon:'🧢',  desc:'+1 click power — the hat gives strength',    baseCost:25,    cpsGain:0,   clickGain:1,   owned:0 },
-    { id:'tie',       name:'Red Tie Factory',      icon:'👔',  desc:'+3 Örvars/sec — mass tie production',        baseCost:80,    cpsGain:3,   clickGain:0,   owned:0 },
-    { id:'sock',      name:'Funky Sock Lab',       icon:'🧦',  desc:'+5 click power — powered by funky socks',    baseCost:120,   cpsGain:0,   clickGain:5,   owned:0 },
-    { id:'suit',      name:'Suit Emporium',        icon:'🕴️',  desc:'+10 Örvars/sec — dapper lads everywhere',    baseCost:300,   cpsGain:10,  clickGain:0,   owned:0 },
-    { id:'bingo',     name:'Bingo Night',          icon:'🎱',  desc:'+20 click power — bingo = big brain',        baseCost:500,   cpsGain:0,   clickGain:20,  owned:0 },
-    { id:'captain',   name:"Captain's Fleet",      icon:'⚓',  desc:'+40 Örvars/sec — sailing to glory',          baseCost:1200,  cpsGain:40,  clickGain:0,   owned:0 },
-    { id:'corsage',   name:'Corsage Plantation',   icon:'🌸',  desc:'+80 click power — flowers = power',          baseCost:2000,  cpsGain:0,   clickGain:80,  owned:0 },
-    { id:'clone',     name:'Örvar Cloning Lab',    icon:'🧬',  desc:'+200 Örvars/sec — exponential örvar',        baseCost:6000,  cpsGain:200, clickGain:0,   owned:0 },
-    { id:'dimension', name:'Örvar Dimension',      icon:'🌀',  desc:'+500 click power — infinite örvar realm',    baseCost:15000, cpsGain:0,   clickGain:500, owned:0 },
-  ];
+      <!-- ── SECTION 1 ── -->
+      <h2 class="section-title" id="early-life">Early life and origins</h2>
+      <p>
+        The exact circumstances of Mother's birth are a subject of ongoing scholarly debate.
+        Official Louisiana records indicate a birth date of "March 32, 1961," which is
+        <span class="cn">[chronologically impossible]</span> and has led many historians to conclude
+        that either the records were forged, or that the state of Louisiana was "just having a rough week."<sup class="ref">[6]</sup>
+        His mother, Gertrude "Trudy" Mother (<i>née</i> Flambeau), was a professional taxidermist;
+        his father, Gerald Mother Sr., was reportedly <i>"a vibe."</i><sup class="ref">[7]</sup>
+      </p>
+      <p>
+        Mother grew up in the bayous of rural Louisiana, where, by his own account, he first
+        developed his trademark survival instincts after a childhood incident involving an
+        <a href="#">alligator</a>, a broken tricycle, and three pounds of pulled pork. He was
+        eight years old. The alligator reportedly fled the scene.<sup class="ref">[8]</sup>
+        Local legend holds that the alligator — known to residents as "Gerald" — still swims
+        upstream whenever someone mentions Joe Mama's name.<span class="cn">[citation needed]</span>
+      </p>
+      <p>
+        He received a fragmented education, attending no fewer than eleven different schools across
+        four states before being <i>"asked to leave"</i> each of them for reasons that range from
+        <i>"disruptive"</i> to <i>"inexplicable"</i> to, in the case of Jefferson Parish Elementary,
+        simply <i>"Mother."</i><sup class="ref">[9]</sup> He holds no formal degrees, though he was
+        awarded an honorary doctorate in <a href="#" class="redlink">Aggressive Optimism</a> from
+        a university in the Maldives that has since sunk beneath the sea.
+      </p>
 
-  function getCost(upg) { return Math.floor(upg.baseCost * Math.pow(1.5, upg.owned)); }
+      <div class="article-quote">
+        "I was born ready. I was also born angry, born hungry, and born forty-five minutes late — which,
+        in retrospect, set the tone for everything that followed."
+        <cite>— Jonathan Y. Mother, <i>I Told You So</i>, p. 1</cite>
+      </div>
 
-  function renderUpgrades() {
-    const c = document.getElementById('upgrades-container');
-    c.innerHTML = '';
-    UPGRADES.forEach((upg, i) => {
-      const cost = getCost(upg);
-      const canAfford = orvars >= cost;
-      const btn = document.createElement('button');
-      btn.className = 'upgrade-btn' + (canAfford ? ' affordable' : '');
-      btn.disabled = !canAfford;
-      btn.innerHTML = `
-        <div class="upgrade-icon">${upg.icon}</div>
-        <div class="upgrade-info">
-          <div class="upgrade-name">${upg.name}</div>
-          <div class="upgrade-desc">${upg.desc}</div>
+      <!-- ── SECTION 2 ── -->
+      <h2 class="section-title" id="rise">Rise to infamy (1985–1994)</h2>
+      <p>
+        By the mid-1980s, Mother had relocated to <a href="#">Las Vegas, Nevada</a>, where he supported
+        himself through a series of odd jobs including: professional card counter (banned from
+        19 casinos), unlicensed coyote wrangler, and — briefly — a mascot for a regional
+        mayonnaise brand called "Big Boy's Spread."<sup class="ref">[10]</sup>
+        It was during this period that he first attracted the attention of <a href="#">Interpol</a>,
+        after a routine traffic stop revealed that his 1979 Oldsmobile Delta 88 contained
+        <i>"an amount of loose gravel inconsistent with any known legal activity."</i><sup class="ref">[11]</sup>
+      </p>
+
+      <h3 class="subsection-title" id="cheese">The Great Cheese Caper (1988)</h3>
+      <p>
+        In the winter of 1988, Mother travelled to <a href="#">Gruyères, Switzerland</a> for reasons
+        he has never adequately explained. What followed became known in intelligence circles as
+        the <b>Great Cheese Caper</b>. According to declassified <a href="#">CIA documents</a> (partially
+        redacted, largely baffling), Mother inadvertently dismantled a 12-person cheese smuggling
+        operation simply by eating his way through their inventory over the course of a long weekend.<sup class="ref">[12]</sup>
+      </p>
+      <p>
+        Swiss authorities initially considered charging Mother with <a href="#" class="redlink">industrial dairy sabotage</a>,
+        but ultimately decided against it after legal experts concluded that <i>"a man eating cheese is
+        not technically a crime, even in these quantities."</i><sup class="ref">[13]</sup> He was, however,
+        banned from Switzerland for a period of eleven years. He returned in 1999, six months early,
+        and ate more cheese. No action was taken.
+      </p>
+
+      <h3 class="subsection-title" id="nacho">The 1994 Great Nacho Incident</h3>
+      <p>
+        The event that cemented Mother's global notoriety occurred on August 14, 1994, at the
+        <b>17th Annual Tex-Mex Invitational</b> in <a href="#">Albuquerque, New Mexico</a>.
+        What was intended to be a competitive eating contest devolved, within forty minutes,
+        into what emergency services have since called <i>"the most structurally catastrophic
+        use of jalapeños in recorded history."</i><sup class="ref">[14]</sup>
+      </p>
+      <p>
+        Official accounts remain classified, but eyewitness testimony — gathered by journalist
+        <a href="#" class="redlink">Pamela Cruikshank</a> for her 1996 exposé — suggests that Mother,
+        upon realising the nacho cheese sauce had been improperly heated, began improvising a
+        corrective technique using a gas burner, a satellite dish, and <i>"an extraordinary amount
+        of confidence."</i><sup class="ref">[15]</sup> The resulting explosion was visible from space.
+        Mother walked away without a scratch, reportedly asking if there were any chips left.
+      </p>
+
+      <!-- ── SECTION 3 ── -->
+      <h2 class="section-title" id="danger">Documented brushes with death</h2>
+      <p>
+        The following is a partial list of Mother's eighteen <i>confirmed</i> near-death experiences,
+        as catalogued by the <a href="#" class="redlink">International Registry of Improbable Survivals (IRIS)</a>.
+        Researchers note that this list does not include any incidents Mother himself rates
+        as <i>"under a 7 out of 10 on the danger scale."</i><sup class="ref">[16]</sup>
+      </p>
+
+      <table style="border-collapse:collapse; width:100%; font-size:12.5px; font-family:'Linux Biolinum',sans-serif; margin-bottom:14px;">
+        <thead>
+          <tr style="background:var(--infobox-header); border:1px solid var(--border);">
+            <th style="padding:6px 10px; text-align:left; border:1px solid var(--border);">#</th>
+            <th style="padding:6px 10px; text-align:left; border:1px solid var(--border);">Year</th>
+            <th style="padding:6px 10px; text-align:left; border:1px solid var(--border);">Incident</th>
+            <th style="padding:6px 10px; text-align:left; border:1px solid var(--border);">Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1969</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Alligator (see above)</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Alligator left. Mother ate the pulled pork.</td>
+          </tr>
+          <tr style="background:#fafafa; border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">2</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1983</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Fell off a moving freight train in <a href="#" style="color:var(--link)">Nebraska</a></td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Landed in a hay bale. Took a nap.</td>
+          </tr>
+          <tr style="border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">3</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1991</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Shot (twice) during a misunderstanding in <a href="#" style="color:var(--link)">Minsk</a></td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">"The bullets apologised." — Mother, 1999</td>
+          </tr>
+          <tr style="background:#fafafa; border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">4</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1994</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">The Nacho Incident</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Asked for more chips.</td>
+          </tr>
+          <tr style="border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">5</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">1997</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Direct collision with a golf cart at 34 mph</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Golf cart totalled. Mother walked to nearest buffet.</td>
+          </tr>
+          <tr style="background:#fafafa; border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">6</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">2001</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Attacked by a <a href="#" style="color:var(--link)">Canadian goose</a> for 40 continuous minutes</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Goose awarded restraining order. Mother appealed.</td>
+          </tr>
+          <tr style="border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">7</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">2005</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Accidentally ingested an entire block of experimental cheese</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Hospitalised briefly. Described experience as "delightful."</td>
+          </tr>
+          <tr style="background:#fafafa; border:1px solid var(--border-light);">
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">8</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">2011</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Declared legally dead in three US states simultaneously</td>
+            <td style="padding:5px 10px;border:1px solid var(--border-light);">Contested all three. Won two. The third is "ongoing."</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        IRIS researcher Dr. Angela Pham noted in her 2017 paper that Mother's survival rate across
+        these incidents is <i>"statistically indistinguishable from divine intervention or catastrophic
+        clerical error."</i><sup class="ref">[17]</sup> Mother, upon being informed of this assessment,
+        reportedly nodded slowly and ordered a large pizza.
+      </p>
+
+      <!-- ── SECTION 4 ── -->
+      <h2 class="section-title" id="international">International incidents</h2>
+      <p>
+        Over the course of his career, Mother has been directly or tangentially linked to numerous
+        international incidents. A full list is maintained by the <a href="#">UN Office for
+        Inexplicable Events</a> (UNOIE), a body established in 2003 specifically to track
+        Mother-related geopolitical disruptions.<sup class="ref">[18]</sup>
+      </p>
+      <p>
+        Among the most notable:
+      </p>
+      <ul style="margin: 0 0 14px 22px; font-size:14px; line-height:1.8;">
+        <li>
+          <b>The Danish Pastry Crisis (1996):</b> Mother entered the <a href="#" class="redlink">Copenhagen International Pastry Cup</a>
+          despite possessing no baking credentials. His entry — a cinnamon roll described by judges as
+          <i>"technically a weapon"</i> — caused a diplomatic incident when the Danish prime minister
+          was photographed attempting to eat one.<sup class="ref">[19]</sup>
+        </li>
+        <li>
+          <b>The Andorran Citizenship Dispute (2000):</b> Following a hiking trip that went
+          severely off-course, Mother spent eleven days in <a href="#">Andorra</a> believing it was
+          Montana. Upon learning the truth, he applied for citizenship on the grounds that he had
+          <i>"clearly been there long enough."</i> The case remains open.<sup class="ref">[20]</sup>
+        </li>
+        <li>
+          <b>The Minsk Misunderstanding (1991):</b> Classified. Involved at least one submarine,
+          fourteen pounds of cured meats, and a man referred to only as <i>"Klaus."</i><sup class="ref">[21]</sup>
+        </li>
+        <li>
+          <b>The 2008 Goose Summit:</b> After losing a legal battle against a Canadian goose,
+          Mother attempted to negotiate directly with what he described as <i>"the goose's
+          government."</i> No formal record exists of the outcome, but wildlife observers reported
+          an unusual number of geese in the vicinity of his home for the following six months.<span class="cn">[citation needed]</span>
+        </li>
+      </ul>
+
+      <!-- ── SECTION 5 ── -->
+      <h2 class="section-title" id="legacy">Legacy and cultural impact</h2>
+      <p>
+        Despite — or perhaps because of — the sheer improbability of his continued existence,
+        Jonathan Y. Mother has become something of a <a href="#">folk hero</a> in certain subcultures.
+        His memoir has been adapted (loosely, and without his permission) into a
+        <a href="#" class="redlink">regional theatre production</a> in Tulsa, Oklahoma, and a
+        podcast hosted by someone who has never met him but claims to
+        <i>"really get the vibe."</i><sup class="ref">[22]</sup>
+      </p>
+      <p>
+        The phrase <b>"doing a Joe Mama"</b> has entered colloquial usage in at least four
+        countries to describe any act of <i>"reckless confidence resulting in implausible
+        success."</i><sup class="ref">[23]</sup> The <a href="#">Oxford English Dictionary</a>
+        declined to include it in their 2021 edition, but noted in an internal memo —
+        later leaked — that they found the definition <i>"oddly compelling."</i>
+      </p>
+      <p>
+        Mother himself has expressed indifference to his cultural legacy. In his only
+        known television interview (an appearance on a 2004 episode of a Lithuanian
+        cooking programme), he stated: <i>"I don't worry about legacy. Legacy worries about me."</i><sup class="ref">[24]</sup>
+      </p>
+
+      <div class="article-quote">
+        "There are two kinds of people in this world: those who have heard of Joe Mama, and those who
+        are about to."
+        <cite>— Dr. Helena Voss, <i>Annals of Improbable Anthropology</i>, Vol. 12, 2019</cite>
+      </div>
+
+      <!-- ── SECTION 6 ── -->
+      <h2 class="section-title" id="sightings">Recent sightings</h2>
+      <p>
+        As of the most recent update to this article, Mother's whereabouts are officially listed as
+        <i>"unknown"</i> by US federal authorities, Interpol, and the management of a Denny's in
+        Flagstaff, Arizona that he owes money to.<sup class="ref">[25]</sup>
+        Unverified sightings have been reported in:
+      </p>
+      <ul style="margin: 0 0 14px 22px; font-size:14px; line-height:1.8;">
+        <li>A <a href="#">Costco</a> in Reno, Nevada (2021) — described as <i>"eating samples with unusual intensity"</i></li>
+        <li>A fishing vessel off the coast of <a href="#">Reykjavík, Iceland</a> (2022)</li>
+        <li>The finish line of the <a href="#">Copenhagen Marathon</a> (2023), despite no evidence of registration</li>
+        <li>An <a href="#">Applebee's</a> in Bismarck, North Dakota, every Tuesday at 4 PM <span class="cn">[citation needed]</span></li>
+      </ul>
+      <p>
+        Law enforcement agencies in multiple countries maintain active files on Mother, though
+        several investigators have noted that the files are <i>"more of a scrapbook at this point."</i><sup class="ref">[26]</sup>
+        The general consensus among those who have pursued him is best summarised by retired
+        Interpol agent Dieter Schulz: <i>"Joe Mama cannot be caught. Joe Mama can only be witnessed."</i><sup class="ref">[27]</sup>
+      </p>
+
+      <!-- ── NOTES ── -->
+      <h2 class="section-title" id="notes">Notes</h2>
+      <p style="font-size:12.5px; font-family:'Linux Biolinum',sans-serif;">
+        <sup>[1]</sup> Three separate death certificates have been issued for Mother across Tennessee,
+        New Mexico, and the island nation of Tuvalu. All three are contested. Mother himself
+        has described the Tennessee certificate as <i>"a bold move"</i> and the Tuvalu one
+        as <i>"flattering."</i>
+      </p>
+
+      <!-- ── REFERENCES ── -->
+      <h2 class="section-title" id="references">References</h2>
+      <ol class="references">
+        <li>Mother, J.Y. (1999). <i>I Told You So: The Joe Mama Story</i>. Self-published. ISBN 0-000-00000-0.</li>
+        <li>Louisiana Vital Records Office. Birth Registration File 1961-∞. Partially legible.</li>
+        <li>Interpol Communiqué No. 4471-M (2003). <i>Subject: That Guy Again</i>. Restricted.</li>
+        <li>US Congressional Hearing Transcript, Subcommittee on Dairy Imports, March 1989.</li>
+        <li>Danish Ministry of Foreign Affairs. Diplomatic Incident Log, 1996–1998.</li>
+        <li>Devereux, P. (2004). <i>The Impossibly Born: Calendar Anomalies in Modern Records.</i> Academic Press.</li>
+        <li>Flambeau, G. (1987). Personal correspondence. Bayou County Historical Archive.</li>
+        <li>Broussard, T. (1991). <i>Beasts of the Bayou.</i> Louisiana Wildlife Press. pp. 44–47.</li>
+        <li>Jefferson Parish Elementary School. Disciplinary files, 1967–1969. Redacted.</li>
+        <li>Big Boy's Spread Internal Memo (1986). "Re: Mascot Behaviour." Unpublished.</li>
+        <li>Nevada Highway Patrol Incident Report NHP-1985-4492. Filed and immediately misfiled.</li>
+        <li>CIA CREST Archive. Document 1988-CHEESE-7. Declassified 2011.</li>
+        <li>Canton of Gruyères v. Mother (1989). Federal Tribunal of Switzerland. Case dismissed.</li>
+        <li>Albuquerque Fire Dept. Incident Report AFA-1994-0814. "Cause: unknown/nachos."</li>
+        <li>Cruikshank, P. (1996). <i>Nacho Man: The Untold Story.</i> Rolling Stone, special edition.</li>
+        <li>IRIS Registry of Improbable Survivals, Vol. 7 (2018). Cases M-001 through M-018.</li>
+        <li>Pham, A. (2017). "Statistical Impossibility as a Biographical Category." <i>Journal of Improbable Research.</i></li>
+        <li>UN General Assembly Resolution A/RES/57/M (2003). Establishment of UNOIE.</li>
+        <li>Copenhagen Pastry Cup Official Records (1996). Protest filed by 11 of 12 judges.</li>
+        <li>Principality of Andorra. Immigration Case File AND-2000-JYM. Ongoing.</li>
+        <li>Minsk Incident After-Action Report (1991). NATO Eyes Only. 47 pages redacted.</li>
+        <li>Tulsans for Theatre Programme Notes, <i>Big Bones: A Musical</i> (2009).</li>
+        <li>Hartmann, E. (2020). "Colloquial Risk-Tolerance Neologisms." <i>Language Quarterly.</i> 14(2): 88–102.</li>
+        <li>Lithuanian National Television. <i>Cooking with Rūta</i>, Episode 214 (2004). Archived.</li>
+        <li>Flagstaff Denny's Internal Collections File (2019–present). "Outstanding balance: $47.20."</li>
+        <li>Anonymous law enforcement official, interviewed 2023. Identity protected per request.</li>
+        <li>Schulz, D. (2022). <i>Thirty Years of Not Quite Catching Him.</i> Europol Retired Officers Press.</li>
+      </ol>
+
+      <!-- NAVBOX -->
+      <div class="navbox">
+        <div class="navbox-header">Dangerous Individuals of the 20th–21st Centuries</div>
+        <div class="navbox-body">
+          <a href="#">Joe Mama</a>
+          <a href="#">The Gruyère Ghost</a>
+          <a href="#">Competitive eaters (historical)</a>
+          <a href="#">International cheese incidents</a>
+          <a href="#">Notable golf cart collisions</a>
+          <a href="#">UNOIE case files</a>
+          <a href="#">Canadian geese (aggressive)</a>
         </div>
-        <div class="upgrade-right">
-          <div class="upgrade-cost">🪙 ${formatNum(cost)}</div>
-          <div class="upgrade-owned">owned: ${upg.owned}</div>
-        </div>`;
-      btn.onclick = () => buyUpgrade(i);
-      c.appendChild(btn);
-    });
-  }
+      </div>
 
-  function buyUpgrade(i) {
-    const upg = UPGRADES[i];
-    const cost = getCost(upg);
-    if (orvars < cost) return;
-    orvars -= cost;
-    upg.owned++;
-    clickPower += upg.clickGain;
-    cps += upg.cpsGain;
-    updateDisplay();
-    renderUpgrades();
-    notify(`${upg.icon} ${upg.name} purchased!`);
-  }
+      <!-- CATEGORIES -->
+      <div class="categories">
+        <b>Categories:</b>
+        <a href="#">1961 births</a>
+        <a href="#">Living people (disputed)</a>
+        <a href="#">American adventurers</a>
+        <a href="#">Cheese-related criminal cases</a>
+        <a href="#">People with Interpol notices</a>
+        <a href="#">International incidents involving nachos</a>
+        <a href="#">Louisiana people</a>
+        <a href="#">Self-published authors</a>
+        <a href="#">People involved in goose-related incidents</a>
+        <a href="#">Articles with disputed neutrality from October 2019</a>
+      </div>
 
-  function clickOrvar(e) {
-    orvars += clickPower;
-    totalOrvars += clickPower;
-    spawnFloat(e.clientX, e.clientY, '+' + clickPower);
-    checkMilestones();
-    updateDisplay();
-    renderUpgrades();
-  }
+    </div><!-- /#article -->
 
-  function spawnFloat(x, y, text) {
-    const el = document.createElement('div');
-    el.className = 'float-num';
-    el.textContent = text;
-    el.style.left = (x + Math.random() * 40 - 20) + 'px';
-    el.style.top = (y - 20) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 900);
-  }
+  </main>
+</div><!-- /#layout -->
 
-  setInterval(() => {
-    if (cps > 0) {
-      const gain = cps / 20;
-      orvars += gain;
-      totalOrvars += gain;
-      checkMilestones();
-      updateDisplay();
-      renderUpgrades();
-    }
-  }, 50);
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer id="footer">
+  <p>
+    This page was last edited on 13 April 2026, at 09:41 (UTC) &nbsp;·&nbsp;
+    <a href="#">Privacy policy</a> &nbsp;·&nbsp;
+    <a href="#">About Wokipedia</a> &nbsp;·&nbsp;
+    <a href="#">Disclaimers</a> &nbsp;·&nbsp;
+    <a href="#">Contact us</a> &nbsp;·&nbsp;
+    <a href="#">Mobile view</a>
+  </p>
+  <p style="margin-top:6px; color:#72777d;">
+    Text is available under the <a href="#">Creative Commons Attribution-ShareAlike 4.0 License</a>.
+    Wokipedia® is a registered trademark of the Wokipedia Foundation, Inc.
+  </p>
+</footer>
 
-  function checkMilestones() {
-    if (milestoneIdx < MILESTONES.length && totalOrvars >= MILESTONES[milestoneIdx]) {
-      notify('🎉 ' + MILESTONE_MSGS[milestoneIdx]);
-      milestoneIdx++;
-      updateMilestoneBar();
-    }
-  }
-
-  function updateMilestoneBar() {
-    const bar = document.getElementById('milestone-bar');
-    if (milestoneIdx >= MILESTONES.length) {
-      bar.innerHTML = '🏆 All milestones reached! You are the Örvar King.';
-    } else {
-      document.getElementById('next-milestone').textContent = formatNum(MILESTONES[milestoneIdx]);
-    }
-  }
-
-  function updateDisplay() {
-    document.getElementById('count').textContent = formatNum(Math.floor(orvars));
-    document.getElementById('cps-display').textContent = formatNum(cps) + ' per second';
-    document.getElementById('click-power-display').textContent = clickPower;
-  }
-
-  function formatNum(n) {
-    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
-    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
-    return Math.floor(n).toString();
-  }
-
-  let notifTimer;
-  function notify(msg) {
-    const el = document.getElementById('notif');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(notifTimer);
-    notifTimer = setTimeout(() => el.classList.remove('show'), 2200);
-  }
-
-  updateMilestoneBar();
-  updateDisplay();
-  renderUpgrades();
-</script>
 </body>
 </html>
