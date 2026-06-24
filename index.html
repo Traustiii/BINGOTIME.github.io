@@ -399,7 +399,9 @@
       const canAfford = orvars >= cost;
       const btn = document.createElement('button');
       btn.className = 'upgrade-btn' + (canAfford ? ' affordable' : '');
-      btn.disabled = !canAfford;
+      // Keep buttons clickable even when unaffordable. The buy function checks the real cost.
+      // This prevents fast DOM re-renders from swallowing clicks after CPS starts.
+      btn.disabled = false;
       btn.innerHTML = `
         <div class="upgrade-icon">${upg.icon}</div>
         <div class="upgrade-info">
@@ -425,7 +427,8 @@
       const canAfford = prestigeTokens >= cost && !maxed;
       const btn = document.createElement('button');
       btn.className = 'upgrade-btn' + (canAfford ? ' affordable' : '');
-      btn.disabled = !canAfford;
+      // Only disable maxed upgrades. Unaffordable upgrades stay clickable, but buyPrestigeUpgrade safely returns.
+      btn.disabled = maxed;
       btn.innerHTML = `
         <div class="upgrade-icon">${upg.icon}</div>
         <div class="upgrade-info">
@@ -444,7 +447,10 @@
   function buyUpgrade(i) {
     const upg = UPGRADES[i];
     const cost = getCost(upg);
-    if (orvars < cost) return;
+    if (orvars < cost) {
+      notify(`Need ${formatNum(cost - orvars)} more Örvars for ${upg.name}.`);
+      return;
+    }
 
     orvars -= cost;
     upg.owned++;
@@ -459,7 +465,10 @@
     const upg = PRESTIGE_UPGRADES[i];
     const cost = getPrestigeUpgradeCost(upg);
     if (upg.owned >= upg.maxOwned) return;
-    if (prestigeTokens < cost) return;
+    if (prestigeTokens < cost) {
+      notify(`Need ${cost - prestigeTokens} more prestige token(s) for ${upg.name}.`);
+      return;
+    }
 
     prestigeTokens -= cost;
     upg.owned++;
@@ -499,7 +508,6 @@
       totalOrvars += gain;
       checkMilestones();
       updateDisplay();
-      renderUpgrades();
     }
   }, 50);
 
@@ -619,6 +627,7 @@
   updateDisplay();
   renderUpgrades();
   renderPrestigeShop();
+
 
   // Autosave every 3 minutes. Manual save button still works too.
   setInterval(() => saveGame(false), 180000);
