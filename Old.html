@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BINGOTIME</title>
+  <title>Örvar Clicker</title>
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -111,28 +111,11 @@
     #notif.show { opacity: 1; }
     .click-power { font-size: 0.78rem; color: var(--muted); text-align: center; }
     .click-power span { color: var(--accent2); font-weight: 700; }
-    .action-btn {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px 14px; color: var(--text); font-family: 'Nunito', sans-serif;
-      font-weight: 900; cursor: pointer; width: 100%; transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    }
-    .action-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e1e38; transform: translateY(-2px); }
-    .action-btn:disabled { opacity: 0.38; cursor: not-allowed; }
-    .save-btn { color: var(--accent3); }
-    .prestige-box {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px 14px; width: 100%; text-align: center; font-size: 0.82rem; color: var(--muted);
-    }
-    .prestige-title { font-family: 'Boogaloo', cursive; color: var(--accent); font-size: 1.25rem; letter-spacing: 1px; margin-bottom: 4px; }
-    .prestige-line { margin: 3px 0; }
-    .prestige-line span { color: var(--accent3); font-weight: 900; }
-    .prestige-btn { margin-top: 10px; color: var(--accent); }
-
   </style>
 </head>
 <body>
 
-<h1>🎱 BINGOTIME 🎱</h1>
+<h1>🎩 Örvar Clicker 🎩</h1>
 <p class="tagline">click him. collect him. praise him.</p>
 <div id="notif"></div>
 
@@ -145,20 +128,11 @@
     </div>
 
     <button class="orvar-btn" id="orvar-btn" onclick="clickOrvar(event)">
-      <img id="orvar-image" src="Bingotime.png" alt="Örvar" draggable="false"/>
+      <img src="Bingotime.png" alt="Örvar" draggable="false"/>
     </button>
 
     <div class="click-power">Each click: <span id="click-power-display">1</span> Örvar(s)</div>
     <div class="milestone-bar" id="milestone-bar">Next milestone: <span id="next-milestone">10</span> Örvars</div>
-    <button class="action-btn save-btn" id="save-btn" onclick="saveGame(true)">💾 Save Game</button>
-
-    <div class="prestige-box">
-      <div class="prestige-title">✨ Prestige</div>
-      <div class="prestige-line">Level: <span id="prestige-level">0</span></div>
-      <div class="prestige-line">Bonus: <span id="prestige-bonus">+0%</span> to all gains</div>
-      <div class="prestige-line">Run total: <span id="run-total">0</span> / <span id="prestige-needed">100.0K</span></div>
-      <button class="action-btn prestige-btn" id="prestige-btn" onclick="prestige()" disabled>✨ Prestige locked</button>
-    </div>
   </div>
 
   <div class="right-panel">
@@ -172,14 +146,6 @@
   let totalOrvars = 0;
   let clickPower = 1;
   let cps = 0;
-  let milestoneIdx = 0;
-  let prestigeLevel = 0;
-
-  const SAVE_KEY = 'bingotime-save-v1';
-  const PRESTIGE_THRESHOLD = 100000;
-  const PRESTIGE_BONUS_PER_LEVEL = 0.25;
-  const DEFAULT_ORVAR_IMAGE = 'Bingotime.png';
-  const PRESTIGE_1_IMAGE = 'Prestige1.png';
 
   const MILESTONES = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
   const MILESTONE_MSGS = [
@@ -193,6 +159,7 @@
     '50,000 Örvars! Örvar galaxy.',
     '100,000 Örvars! THE ÖRVAR DIMENSION IS OPEN.',
   ];
+  let milestoneIdx = 0;
 
   const UPGRADES = [
     { id:'friend',    name:'Send a Friend',       icon:'🙋',  desc:'+1 Örvar/sec — he brings a buddy',           baseCost:15,    cpsGain:1,   clickGain:0,   owned:0 },
@@ -208,61 +175,6 @@
   ];
 
   function getCost(upg) { return Math.floor(upg.baseCost * Math.pow(1.5, upg.owned)); }
-  function getPrestigeMultiplier() { return 1 + prestigeLevel * PRESTIGE_BONUS_PER_LEVEL; }
-
-  function updateOrvarImage() {
-    const img = document.getElementById('orvar-image');
-    if (!img) return;
-    img.src = prestigeLevel >= 1 ? PRESTIGE_1_IMAGE : DEFAULT_ORVAR_IMAGE;
-  }
-
-  function recalculateStats() {
-    clickPower = 1;
-    cps = 0;
-    UPGRADES.forEach(upg => {
-      clickPower += upg.clickGain * upg.owned;
-      cps += upg.cpsGain * upg.owned;
-    });
-  }
-
-  function saveGame(showNotif = false) {
-    const save = {
-      orvars,
-      totalOrvars,
-      milestoneIdx,
-      prestigeLevel,
-      upgrades: UPGRADES.map(u => ({ id: u.id, owned: u.owned }))
-    };
-
-    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-    if (showNotif) notify('💾 Game saved!');
-  }
-
-  function loadGame() {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return;
-
-    try {
-      const save = JSON.parse(raw);
-      orvars = Number(save.orvars) || 0;
-      totalOrvars = Number(save.totalOrvars) || 0;
-      milestoneIdx = Number(save.milestoneIdx) || 0;
-      prestigeLevel = Number(save.prestigeLevel) || 0;
-
-      if (Array.isArray(save.upgrades)) {
-        save.upgrades.forEach(savedUpg => {
-          const upg = UPGRADES.find(u => u.id === savedUpg.id);
-          if (upg) upg.owned = Number(savedUpg.owned) || 0;
-        });
-      }
-
-      recalculateStats();
-      notify('✅ Save loaded!');
-    } catch (err) {
-      console.error('Could not load save:', err);
-      notify('⚠️ Could not load save.');
-    }
-  }
 
   function renderUpgrades() {
     const c = document.getElementById('upgrades-container');
@@ -292,21 +204,19 @@
     const upg = UPGRADES[i];
     const cost = getCost(upg);
     if (orvars < cost) return;
-
     orvars -= cost;
     upg.owned++;
-    recalculateStats();
-
+    clickPower += upg.clickGain;
+    cps += upg.cpsGain;
     updateDisplay();
     renderUpgrades();
     notify(`${upg.icon} ${upg.name} purchased!`);
   }
 
   function clickOrvar(e) {
-    const gain = clickPower * getPrestigeMultiplier();
-    orvars += gain;
-    totalOrvars += gain;
-    spawnFloat(e.clientX, e.clientY, '+' + formatNum(gain));
+    orvars += clickPower;
+    totalOrvars += clickPower;
+    spawnFloat(e.clientX, e.clientY, '+' + clickPower);
     checkMilestones();
     updateDisplay();
     renderUpgrades();
@@ -324,7 +234,7 @@
 
   setInterval(() => {
     if (cps > 0) {
-      const gain = (cps * getPrestigeMultiplier()) / 20;
+      const gain = cps / 20;
       orvars += gain;
       totalOrvars += gain;
       checkMilestones();
@@ -332,27 +242,6 @@
       renderUpgrades();
     }
   }, 50);
-
-  function prestige() {
-    if (totalOrvars < PRESTIGE_THRESHOLD) {
-      notify(`Need ${formatNum(PRESTIGE_THRESHOLD)} run total to prestige!`);
-      return;
-    }
-
-    prestigeLevel++;
-    orvars = 0;
-    totalOrvars = 0;
-    milestoneIdx = 0;
-    UPGRADES.forEach(upg => upg.owned = 0);
-    recalculateStats();
-    updateOrvarImage();
-
-    saveGame(false);
-    updateMilestoneBar();
-    updateDisplay();
-    renderUpgrades();
-    notify(`✨ Prestige ${prestigeLevel}! ${formatPrestigeBonus()} bonus unlocked.`);
-  }
 
   function checkMilestones() {
     if (milestoneIdx < MILESTONES.length && totalOrvars >= MILESTONES[milestoneIdx]) {
@@ -367,39 +256,17 @@
     if (milestoneIdx >= MILESTONES.length) {
       bar.innerHTML = '🏆 All milestones reached! You are the Örvar King.';
     } else {
-      bar.innerHTML = `Next milestone: <span id="next-milestone">${formatNum(MILESTONES[milestoneIdx])}</span> Örvars`;
+      document.getElementById('next-milestone').textContent = formatNum(MILESTONES[milestoneIdx]);
     }
   }
 
-  function updatePrestigeDisplay() {
-    document.getElementById('prestige-level').textContent = prestigeLevel;
-    document.getElementById('prestige-bonus').textContent = formatPrestigeBonus();
-    document.getElementById('run-total').textContent = formatNum(totalOrvars);
-    document.getElementById('prestige-needed').textContent = formatNum(PRESTIGE_THRESHOLD);
-
-    const btn = document.getElementById('prestige-btn');
-    const ready = totalOrvars >= PRESTIGE_THRESHOLD;
-    btn.disabled = !ready;
-    btn.textContent = ready ? '✨ Prestige now' : '✨ Prestige locked';
-  }
-
   function updateDisplay() {
-    const multiplier = getPrestigeMultiplier();
-    const effectiveClickPower = clickPower * multiplier;
-    const effectiveCps = cps * multiplier;
-
-    document.getElementById('count').textContent = formatNum(orvars);
-    document.getElementById('cps-display').textContent = formatNum(effectiveCps) + ' per second';
-    document.getElementById('click-power-display').textContent = formatNum(effectiveClickPower);
-    updatePrestigeDisplay();
-  }
-
-  function formatPrestigeBonus() {
-    return '+' + Math.round((getPrestigeMultiplier() - 1) * 100) + '%';
+    document.getElementById('count').textContent = formatNum(Math.floor(orvars));
+    document.getElementById('cps-display').textContent = formatNum(cps) + ' per second';
+    document.getElementById('click-power-display').textContent = clickPower;
   }
 
   function formatNum(n) {
-    if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
     if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
     if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
     return Math.floor(n).toString();
@@ -414,14 +281,9 @@
     notifTimer = setTimeout(() => el.classList.remove('show'), 2200);
   }
 
-  loadGame();
-  updateOrvarImage();
   updateMilestoneBar();
   updateDisplay();
   renderUpgrades();
-
-  // Autosave every 3 minutes. Manual save button still works too.
-  setInterval(() => saveGame(false), 180000);
 </script>
 </body>
 </html>
