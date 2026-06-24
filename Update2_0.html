@@ -128,18 +128,6 @@
     .prestige-line span { color: var(--accent3); font-weight: 900; }
     .prestige-btn { margin-top: 10px; color: var(--accent); }
 
-    .prestige-token-line {
-      background: #0f0f22; border: 1px solid var(--border); border-radius: 10px;
-      padding: 8px 12px; font-size: 0.82rem; color: var(--muted); text-align: center;
-    }
-    .prestige-token-line span { color: var(--accent3); font-weight: 900; }
-    .milestone-reward-list {
-      background: #0f0f22; border: 1px solid var(--border); border-radius: 10px;
-      padding: 10px 12px; width: 100%; font-size: 0.75rem; color: var(--muted);
-    }
-    .milestone-reward-list strong { color: var(--accent); }
-    .milestone-reward-list div { margin-top: 4px; }
-
   </style>
 </head>
 <body>
@@ -167,29 +155,15 @@
     <div class="prestige-box">
       <div class="prestige-title">✨ Prestige</div>
       <div class="prestige-line">Level: <span id="prestige-level">0</span></div>
-      <div class="prestige-line">Tokens: <span id="prestige-tokens-left">0</span></div>
-      <div class="prestige-line">All-gain bonus: <span id="prestige-bonus">+0%</span></div>
+      <div class="prestige-line">Bonus: <span id="prestige-bonus">+0%</span> to all gains</div>
       <div class="prestige-line">Run total: <span id="run-total">0</span> / <span id="prestige-needed">100.0K</span></div>
-      <div class="prestige-line">Next prestige gives: <span id="next-prestige-tokens">1</span> token(s)</div>
       <button class="action-btn prestige-btn" id="prestige-btn" onclick="prestige()" disabled>✨ Prestige locked</button>
-    </div>
-
-    <div class="milestone-reward-list">
-      <strong>Milestone rewards</strong>
-      <div>10: +1 click power</div>
-      <div>100: +5 CPS</div>
-      <div>1K: +5% all gains</div>
-      <div>100K: huge bonus + prestige ready</div>
     </div>
   </div>
 
   <div class="right-panel">
     <div class="section-title">⬆️ Upgrades</div>
     <div id="upgrades-container"></div>
-
-    <div class="section-title">✨ Prestige Shop</div>
-    <div class="prestige-token-line">Available prestige tokens: <span id="prestige-tokens-shop">0</span></div>
-    <div id="prestige-shop-container"></div>
   </div>
 </div>
 
@@ -200,10 +174,6 @@
   let cps = 0;
   let milestoneIdx = 0;
   let prestigeLevel = 0;
-  let prestigeTokens = 0;
-  let milestoneClickBonus = 0;
-  let milestoneCpsBonus = 0;
-  let milestoneGainBonus = 0;
 
   const SAVE_KEY = 'bingotime-save-v1';
   const PRESTIGE_THRESHOLD = 100000;
@@ -213,15 +183,15 @@
 
   const MILESTONES = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
   const MILESTONE_MSGS = [
-    '10 Örvars! Reward: +1 click power.',
-    '50 Örvars! Reward: +3 click power.',
-    '100 Örvars! Reward: +5 Örvars/sec.',
-    '500 Örvars! Reward: +10 click power.',
-    '1,000 Örvars! Reward: +5% all gains.',
-    '5,000 Örvars! Reward: +30 Örvars/sec.',
-    '10,000 Örvars! Reward: +10% all gains.',
-    '50,000 Örvars! Reward: +150 click power.',
-    '100,000 Örvars! Reward: +25% all gains. Prestige is ready!',
+    '10 Örvars! He\'s flattered.',
+    '50 Örvars! The gang is growing.',
+    '100 Örvars! A full classroom of Örvars.',
+    '500 Örvars! A village of Örvars.',
+    '1,000 Örvars! A tiny Örvar nation.',
+    '5,000 Örvars! Örvar continent unlocked.',
+    '10,000 Örvars! Planet Örvar.',
+    '50,000 Örvars! Örvar galaxy.',
+    '100,000 Örvars! THE ÖRVAR DIMENSION IS OPEN.',
   ];
 
   const UPGRADES = [
@@ -237,81 +207,8 @@
     { id:'dimension', name:'Örvar Dimension',      icon:'🌀',  desc:'+500 click power — infinite örvar realm',    baseCost:15000, cpsGain:0,   clickGain:500, owned:0 },
   ];
 
-  const PRESTIGE_UPGRADES = [
-    {
-      id:'dorms',
-      name:'Gista á háskólagörðunum',
-      icon:'🏠',
-      desc:'+5 starting Örvars/sec every run',
-      baseTokenCost:1,
-      maxOwned:10,
-      owned:0
-    },
-    {
-      id:'home13',
-      name:'Flýta sér heim eftir 13 vikna',
-      icon:'🏃',
-      desc:'+10% click power per level',
-      baseTokenCost:2,
-      maxOwned:10,
-      owned:0
-    },
-    {
-      id:'bingotimePrestige',
-      name:'BingoTime',
-      icon:'🎱',
-      desc:'+15% all gains per level',
-      baseTokenCost:3,
-      maxOwned:10,
-      owned:0
-    },
-    {
-      id:'dkWeatherHater',
-      name:'Hater á gott veður í dk',
-      icon:'🌧️',
-      desc:'+20% CPS per level',
-      baseTokenCost:2,
-      maxOwned:10,
-      owned:0
-    },
-  ];
-
-  function getCost(upg) {
-    return Math.floor(upg.baseCost * Math.pow(1.5, upg.owned));
-  }
-
-  function getPrestigeUpgradeCost(upg) {
-    return upg.baseTokenCost + upg.owned;
-  }
-
-  function getPrestigeUpgradeOwned(id) {
-    const upg = PRESTIGE_UPGRADES.find(u => u.id === id);
-    return upg ? upg.owned : 0;
-  }
-
-  function getPrestigeLevelMultiplier() {
-    return 1 + prestigeLevel * PRESTIGE_BONUS_PER_LEVEL;
-  }
-
-  function getPrestigeShopAllMultiplier() {
-    return 1 + getPrestigeUpgradeOwned('bingotimePrestige') * 0.15;
-  }
-
-  function getMilestoneGainMultiplier() {
-    return 1 + milestoneGainBonus;
-  }
-
-  function getTotalGainMultiplier() {
-    return getPrestigeLevelMultiplier() * getPrestigeShopAllMultiplier() * getMilestoneGainMultiplier();
-  }
-
-  function getEffectiveClickPower() {
-    return clickPower * getTotalGainMultiplier();
-  }
-
-  function getEffectiveCps() {
-    return cps * getTotalGainMultiplier();
-  }
+  function getCost(upg) { return Math.floor(upg.baseCost * Math.pow(1.5, upg.owned)); }
+  function getPrestigeMultiplier() { return 1 + prestigeLevel * PRESTIGE_BONUS_PER_LEVEL; }
 
   function updateOrvarImage() {
     const img = document.getElementById('orvar-image');
@@ -320,20 +217,12 @@
   }
 
   function recalculateStats() {
-    const prestigeClickMultiplier = 1 + getPrestigeUpgradeOwned('home13') * 0.10;
-    const prestigeCpsMultiplier = 1 + getPrestigeUpgradeOwned('dkWeatherHater') * 0.20;
-    const dormStartingCps = getPrestigeUpgradeOwned('dorms') * 5;
-
-    let baseClickPower = 1 + milestoneClickBonus;
-    let baseCps = milestoneCpsBonus + dormStartingCps;
-
+    clickPower = 1;
+    cps = 0;
     UPGRADES.forEach(upg => {
-      baseClickPower += upg.clickGain * upg.owned;
-      baseCps += upg.cpsGain * upg.owned;
+      clickPower += upg.clickGain * upg.owned;
+      cps += upg.cpsGain * upg.owned;
     });
-
-    clickPower = baseClickPower * prestigeClickMultiplier;
-    cps = baseCps * prestigeCpsMultiplier;
   }
 
   function saveGame(showNotif = false) {
@@ -341,13 +230,8 @@
       orvars,
       totalOrvars,
       milestoneIdx,
-      milestoneClickBonus,
-      milestoneCpsBonus,
-      milestoneGainBonus,
       prestigeLevel,
-      prestigeTokens,
-      upgrades: UPGRADES.map(u => ({ id: u.id, owned: u.owned })),
-      prestigeUpgrades: PRESTIGE_UPGRADES.map(u => ({ id: u.id, owned: u.owned }))
+      upgrades: UPGRADES.map(u => ({ id: u.id, owned: u.owned }))
     };
 
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
@@ -363,22 +247,11 @@
       orvars = Number(save.orvars) || 0;
       totalOrvars = Number(save.totalOrvars) || 0;
       milestoneIdx = Number(save.milestoneIdx) || 0;
-      milestoneClickBonus = Number(save.milestoneClickBonus) || 0;
-      milestoneCpsBonus = Number(save.milestoneCpsBonus) || 0;
-      milestoneGainBonus = Number(save.milestoneGainBonus) || 0;
       prestigeLevel = Number(save.prestigeLevel) || 0;
-      prestigeTokens = Number(save.prestigeTokens) || 0;
 
       if (Array.isArray(save.upgrades)) {
         save.upgrades.forEach(savedUpg => {
           const upg = UPGRADES.find(u => u.id === savedUpg.id);
-          if (upg) upg.owned = Number(savedUpg.owned) || 0;
-        });
-      }
-
-      if (Array.isArray(save.prestigeUpgrades)) {
-        save.prestigeUpgrades.forEach(savedUpg => {
-          const upg = PRESTIGE_UPGRADES.find(u => u.id === savedUpg.id);
           if (upg) upg.owned = Number(savedUpg.owned) || 0;
         });
       }
@@ -415,32 +288,6 @@
     });
   }
 
-  function renderPrestigeShop() {
-    const c = document.getElementById('prestige-shop-container');
-    c.innerHTML = '';
-
-    PRESTIGE_UPGRADES.forEach((upg, i) => {
-      const cost = getPrestigeUpgradeCost(upg);
-      const maxed = upg.owned >= upg.maxOwned;
-      const canAfford = prestigeTokens >= cost && !maxed;
-      const btn = document.createElement('button');
-      btn.className = 'upgrade-btn' + (canAfford ? ' affordable' : '');
-      btn.disabled = !canAfford;
-      btn.innerHTML = `
-        <div class="upgrade-icon">${upg.icon}</div>
-        <div class="upgrade-info">
-          <div class="upgrade-name">${upg.name}</div>
-          <div class="upgrade-desc">${upg.desc}</div>
-        </div>
-        <div class="upgrade-right">
-          <div class="upgrade-cost">🎟️ ${maxed ? 'MAX' : cost}</div>
-          <div class="upgrade-owned">level: ${upg.owned}/${upg.maxOwned}</div>
-        </div>`;
-      btn.onclick = () => buyPrestigeUpgrade(i);
-      c.appendChild(btn);
-    });
-  }
-
   function buyUpgrade(i) {
     const upg = UPGRADES[i];
     const cost = getCost(upg);
@@ -455,25 +302,8 @@
     notify(`${upg.icon} ${upg.name} purchased!`);
   }
 
-  function buyPrestigeUpgrade(i) {
-    const upg = PRESTIGE_UPGRADES[i];
-    const cost = getPrestigeUpgradeCost(upg);
-    if (upg.owned >= upg.maxOwned) return;
-    if (prestigeTokens < cost) return;
-
-    prestigeTokens -= cost;
-    upg.owned++;
-    recalculateStats();
-
-    saveGame(false);
-    updateDisplay();
-    renderUpgrades();
-    renderPrestigeShop();
-    notify(`${upg.icon} ${upg.name} upgraded!`);
-  }
-
   function clickOrvar(e) {
-    const gain = getEffectiveClickPower();
+    const gain = clickPower * getPrestigeMultiplier();
     orvars += gain;
     totalOrvars += gain;
     spawnFloat(e.clientX, e.clientY, '+' + formatNum(gain));
@@ -494,7 +324,7 @@
 
   setInterval(() => {
     if (cps > 0) {
-      const gain = getEffectiveCps() / 20;
+      const gain = (cps * getPrestigeMultiplier()) / 20;
       orvars += gain;
       totalOrvars += gain;
       checkMilestones();
@@ -503,26 +333,16 @@
     }
   }, 50);
 
-  function getNextPrestigeTokenReward() {
-    return prestigeLevel + 1;
-  }
-
   function prestige() {
     if (totalOrvars < PRESTIGE_THRESHOLD) {
       notify(`Need ${formatNum(PRESTIGE_THRESHOLD)} run total to prestige!`);
       return;
     }
 
-    const tokensEarned = getNextPrestigeTokenReward();
     prestigeLevel++;
-    prestigeTokens += tokensEarned;
-
     orvars = 0;
     totalOrvars = 0;
     milestoneIdx = 0;
-    milestoneClickBonus = 0;
-    milestoneCpsBonus = 0;
-    milestoneGainBonus = 0;
     UPGRADES.forEach(upg => upg.owned = 0);
     recalculateStats();
     updateOrvarImage();
@@ -531,40 +351,21 @@
     updateMilestoneBar();
     updateDisplay();
     renderUpgrades();
-    renderPrestigeShop();
-    notify(`✨ Prestige ${prestigeLevel}! +${tokensEarned} prestige token(s).`);
-  }
-
-  function applyMilestoneReward(index) {
-    if (index === 0) milestoneClickBonus += 1;
-    if (index === 1) milestoneClickBonus += 3;
-    if (index === 2) milestoneCpsBonus += 5;
-    if (index === 3) milestoneClickBonus += 10;
-    if (index === 4) milestoneGainBonus += 0.05;
-    if (index === 5) milestoneCpsBonus += 30;
-    if (index === 6) milestoneGainBonus += 0.10;
-    if (index === 7) milestoneClickBonus += 150;
-    if (index === 8) milestoneGainBonus += 0.25;
-    recalculateStats();
+    notify(`✨ Prestige ${prestigeLevel}! ${formatPrestigeBonus()} bonus unlocked.`);
   }
 
   function checkMilestones() {
-    let lastMessage = '';
-
-    while (milestoneIdx < MILESTONES.length && totalOrvars >= MILESTONES[milestoneIdx]) {
-      applyMilestoneReward(milestoneIdx);
-      lastMessage = '🎉 ' + MILESTONE_MSGS[milestoneIdx];
+    if (milestoneIdx < MILESTONES.length && totalOrvars >= MILESTONES[milestoneIdx]) {
+      notify('🎉 ' + MILESTONE_MSGS[milestoneIdx]);
       milestoneIdx++;
       updateMilestoneBar();
     }
-
-    if (lastMessage) notify(lastMessage);
   }
 
   function updateMilestoneBar() {
     const bar = document.getElementById('milestone-bar');
     if (milestoneIdx >= MILESTONES.length) {
-      bar.innerHTML = '🏆 All milestones reached! You are ready to prestige.';
+      bar.innerHTML = '🏆 All milestones reached! You are the Örvar King.';
     } else {
       bar.innerHTML = `Next milestone: <span id="next-milestone">${formatNum(MILESTONES[milestoneIdx])}</span> Örvars`;
     }
@@ -572,32 +373,32 @@
 
   function updatePrestigeDisplay() {
     document.getElementById('prestige-level').textContent = prestigeLevel;
-    document.getElementById('prestige-bonus').textContent = formatTotalGainBonus();
+    document.getElementById('prestige-bonus').textContent = formatPrestigeBonus();
     document.getElementById('run-total').textContent = formatNum(totalOrvars);
     document.getElementById('prestige-needed').textContent = formatNum(PRESTIGE_THRESHOLD);
-    document.getElementById('next-prestige-tokens').textContent = getNextPrestigeTokenReward();
-    document.getElementById('prestige-tokens-left').textContent = prestigeTokens;
-    document.getElementById('prestige-tokens-shop').textContent = prestigeTokens;
 
     const btn = document.getElementById('prestige-btn');
     const ready = totalOrvars >= PRESTIGE_THRESHOLD;
     btn.disabled = !ready;
-    btn.textContent = ready ? `✨ Prestige now (+${getNextPrestigeTokenReward()} token/s)` : '✨ Prestige locked';
+    btn.textContent = ready ? '✨ Prestige now' : '✨ Prestige locked';
   }
 
   function updateDisplay() {
+    const multiplier = getPrestigeMultiplier();
+    const effectiveClickPower = clickPower * multiplier;
+    const effectiveCps = cps * multiplier;
+
     document.getElementById('count').textContent = formatNum(orvars);
-    document.getElementById('cps-display').textContent = formatNum(getEffectiveCps()) + ' per second';
-    document.getElementById('click-power-display').textContent = formatNum(getEffectiveClickPower());
+    document.getElementById('cps-display').textContent = formatNum(effectiveCps) + ' per second';
+    document.getElementById('click-power-display').textContent = formatNum(effectiveClickPower);
     updatePrestigeDisplay();
   }
 
-  function formatTotalGainBonus() {
-    return '+' + Math.round((getTotalGainMultiplier() - 1) * 100) + '%';
+  function formatPrestigeBonus() {
+    return '+' + Math.round((getPrestigeMultiplier() - 1) * 100) + '%';
   }
 
   function formatNum(n) {
-    if (n >= 1e12) return (n/1e12).toFixed(1) + 'T';
     if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
     if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
     if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
@@ -618,7 +419,6 @@
   updateMilestoneBar();
   updateDisplay();
   renderUpgrades();
-  renderPrestigeShop();
 
   // Autosave every 3 minutes. Manual save button still works too.
   setInterval(() => saveGame(false), 180000);
